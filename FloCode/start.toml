@@ -1,0 +1,23 @@
+
+#Relative paths are always relative to the location of start.toml
+
+[Start]
+
+start_object = "FlogramSampleCode.flo"
+start_folder = '.' # Relative path to initial object(defaults to same folder)
+start_function = "start"
+start_params = ''
+
+[Modules]
+#Relative or absolute paths to local folders or objects
+local = [ 
+    '.'   #Use Compile all files in this directory
+]
+online = [ #Packages hosted on Flogram.com or private repo (Coming Soon!)
+
+]
+
+[Compilation]
+    debug = true
+    allowWarnings = false
+

@@ -1,0 +1,51 @@
+#pragma once
+class CompileObj{
+public:
+	void compile_file(const char* file_name);
+	enum keywords {
+		comment_single_line,// #
+		comment_open,		// #[
+		comment_close,		// ]#
+		brace_open,			// {
+		brace_close,		// }
+		atomic,				// atomic
+		bool_,				// bool
+		break_,				// break
+		case_,				// case:
+		catch_,				// catch
+		enum_,				// enum
+		exit,				// exit program
+		finally,			// 
+		fn,					// funtion
+		fp32,				// 32 bit floating point
+		fp64,				// 64 bit floating point
+		global,				// global
+		if_,				// if
+		int8,				// int - 8 bit
+		int16,				// int - 16 bit
+		int32,				// int - 32 bit
+		int64,				// int - 64 bit
+		let,				// let
+		loop,				// loop
+		match,				// match
+		mut,				// mut
+		Object,				// Object
+		open,
+		read,
+		return_,			// return
+		str,				// str (string)
+		throw_,				// throw
+		try_,				// try
+		Type,				// Type
+		uint8,				// unsigned int 8 bits
+		uint16,				// unsigned int 16 bits
+		uint32,				// unsigned int 32 bits
+		uint64,				// unsigned int 64 bits
+		write
+	};
+
+private:
+	char* read_file_into_memory(const char* file_name, int* file_size);
+	char* convert_code_human_to_binary(char *human_code, int file_size);
+	char* word_match(const char* look_for_me, char* human_code, int cur_pos);
+};

@@ -1,0 +1,54 @@
+#This is a comment
+#file name (minus .flo) is the name of the object
+
+## <- more than one
+This is a multiline comment
+## <- close multiline comment with more than one two, rest of line is a comment
+
+| var_in is false error # show thrown exceptions
+| other exception
+	x: bool
+	samp_dec: dec
+	samp_int: integer
+	samp_big_int: big integer
+	samp_small_int: small integer
+	samp_string: string
+	other_object_type sample_obj;
+	
+	var_in: bool, var_in2: ref int -> function_name -> var_out: int, var_out2: dec {
+		
+		if(var_in == false)
+		{
+			
+		}
+		else 
+		{
+			throw "var_in is false error";
+		}
+		
+		loop(x == false)
+		{
+			exit loop  #can add number after loop to indicate you want to exit multiple loops, or even "exit match loop loop" to indicate you are exiting the match, then the loop, then another loop
+		}
+		
+		loop(x = 1; x<10; x++)
+		{
+			
+		}
+		
+		match(x){
+			true => var_out = 1
+			false => 
+			{
+				write "x cannot be false!"
+				exit program
+			}
+		}
+		
+		var_out2 = 10 #must set both out values before returning
+		
+		sample_obj.call_function();
+		sample_obj.one_in_two_out(var_in2) -> samp_dec, samp_int
+		
+		exit #exit with nothing else after it, exits the function
+	}
