@@ -48,4 +48,5 @@ private:
 	char* read_file_into_memory(const char* file_name, int* file_size);
 	char* convert_code_human_to_binary(char *human_code, int file_size);
 	char* word_match(const char* look_for_me, char* human_code, int cur_pos);
+	int fast_forward_till_comment_end(const char* look_for_me, char* human_code, int cur_pos);
 };
