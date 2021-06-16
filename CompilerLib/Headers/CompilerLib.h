@@ -4,8 +4,8 @@ public:
 	void compile_file(const char* file_name);
 	enum keywords {
 		comment_single_line,// #
-		comment_open,		// #[
-		comment_close,		// ]#
+		comment_open,		// <#
+		comment_close,		// #>
 		brace_open,			// {
 		brace_close,		// }
 		atomic,				// atomic
@@ -16,7 +16,7 @@ public:
 		enum_,				// enum
 		exit,				// exit program
 		finally,			// 
-		fn,					// funtion
+		fn,					// function
 		fp32,				// 32 bit floating point
 		fp64,				// 64 bit floating point
 		global,				// global
@@ -48,5 +48,7 @@ private:
 	char* read_file_into_memory(const char* file_name, int* file_size);
 	char* convert_code_human_to_binary(char *human_code, int file_size);
 	char* word_match(const char* look_for_me, char* human_code, int cur_pos);
-	int fast_forward_till_comment_end(const char* look_for_me, char* human_code, int cur_pos);
+	int fast_forward_till_comment_end(char* human_code, int cur_pos);
+	int fast_forward_through_whitespace(char* human_code, int cur_pos);
+	int fast_forward_till_line_end(char* human_code, int cur_pos, int file_size);
 };

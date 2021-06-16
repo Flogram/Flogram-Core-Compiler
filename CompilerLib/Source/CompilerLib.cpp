@@ -33,8 +33,74 @@ char* CompileObj::word_match(const char* look_for_me, char* human_code, int cur_
 
 }
 
-int CompileObj::fast_forward_till_comment_end(const char* look_for_me, char* human_code, int cur_pos) {
 
+/// <summary>
+/// Fast forward until you reach the end of the comment
+/// Treat comments as nested
+/// </summary>
+/// <param name="human_code">Pointer to beginning of this block of code</param>
+/// <param name="cur_pos">Start fast forwarding here</param>
+/// <returns></returns>
+int CompileObj::fast_forward_till_comment_end(char* human_code, int cur_pos) {
+	//allow nested comments   <#  #>
+	int num_open_comments = 1;
+
+	while (true) {
+		if (human_code[cur_pos + 1] == '#' && human_code[cur_pos + 1] == '>') {
+			if (num_open_comments == 1) {
+				break;
+			}
+			num_open_comments -= 1;
+		}
+		else if (human_code[cur_pos + 1] == '<' && human_code[cur_pos+1] == '#') {
+			num_open_comments += 1;
+		}
+		cur_pos++;
+	}
+}
+
+/// <summary>
+/// Step through code until you reach the beginning of the next line
+/// </summary>
+/// <param name="look_for_me"></param>
+/// <param name="human_code">Pointer to beginning of this block of code</param>
+/// <param name="cur_pos">Start fast forwarding here</param>
+/// <returns>new character position</returns>
+int CompileObj::fast_forward_till_line_end(char* human_code, int cur_pos, int file_size) {
+	//line ending could be '\n', '\r', or "\r\n"
+	while (true && cur_pos < file_size) {
+		if (human_code[cur_pos] == '\r') {
+			if (human_code[cur_pos + 1] == '\n') {
+				return cur_pos + 2;
+			}
+			return cur_pos + 1;
+		}
+		else if (human_code[cur_pos] == '\n') {
+			return cur_pos + 1;
+		}
+		cur_pos++;
+	}
+	return cur_pos;
+}
+
+/// <summary>
+/// Step through non-code characters until you get to a letter or { or } or # or < which indicates the beginning of a variable
+/// Fast forward through whitespace <tab> <newline> <space>
+/// </summary>
+/// <param name="look_for_me"></param>
+/// <param name="human_code">pointer to beginning of block of code</param>
+/// <param name="cur_pos">Start fast forwarding here</param>
+/// <returns>new character position</returns>
+int CompileObj::fast_forward_through_whitespace(char* human_code, int cur_pos) {
+
+	while(true){
+		char cur_char = human_code[cur_pos];
+		if (cur_char != ' ' && cur_char != '/t' && cur_char != '/n' && cur_char != '/r') {
+			return cur_pos;
+		}
+
+		cur_pos++;
+	}
 }
 
 char* CompileObj::convert_code_human_to_binary(char* human_code, int file_size) {
@@ -49,19 +115,14 @@ char* CompileObj::convert_code_human_to_binary(char* human_code, int file_size) 
 		switch (next_char) {
 			//comment_single_line		// #
 			case '#':
-				if (human_code[cur_pos + 1] == '[') {
-					//comment_open		// #[
-					//fast forward until you hit ]#, which closes the comment
+				//skip rest of line, fast forward until you hit a newline
 
-				}
-				else {
-					//skip rest of line, fast forward until you hit a newline
-				}
 
 				break;
-			case ']':
+			case '<':  // <# multi-line comment #>
 				if (human_code[cur_pos + 1] = '#') {
-					//comment_close	// ]#
+					//comment_close	// #>
+					cur_pos = fast_forward_till_comment_end(human_code, cur_pos + 2);
 				}
 				break;
 		}
