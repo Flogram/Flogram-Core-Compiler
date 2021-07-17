@@ -34,10 +34,6 @@ char* CompileObj::word_match(const char* look_for_me, char* human_code, int cur_
 	return NULL;
 }
 
-<<<<<<< HEAD
-int CompileObj::fast_forward_till_comment_end(const char* look_for_me, char* human_code, int cur_pos) {
-	return 0;
-=======
 
 /// <summary>
 /// Fast forward until you reach the end of the comment
@@ -120,7 +116,6 @@ char CompileObj::determine_line_ending_character(char* human_code, int file_size
 	}
 	//if we reach here, no line endings detected, so it doesn't really matter
 	return 1;
->>>>>>> 8334dc2c546c1a503ec9618c0c2b41f7bad9f1e9
 }
 
 

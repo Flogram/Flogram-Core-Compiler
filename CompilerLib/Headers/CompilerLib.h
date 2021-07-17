@@ -54,13 +54,5 @@ private:
 	char determine_line_ending_character(char* human_code, int file_size, int& line_ending_extra_one);
 	char* convert_code_human_to_binary(char *human_code, int file_size);
 	char* word_match(const char* look_for_me, char* human_code, int cur_pos);
-<<<<<<< HEAD
 	int fast_forward_till_comment_end(const char* look_for_me, char* human_code, int cur_pos);
-=======
-	int fast_forward_till_comment_end(char* human_code, int cur_pos, int file_size, int& cur_line, int& line_started_at_char_num, char line_ending_char, int line_ending_extra_one);
-	cur_pos_and_lines_skipped fast_forward_through_whitespace(char* human_code, int cur_pos, int file_size);
-	int fast_forward_till_line_end(char* human_code, int cur_pos, int file_size);
-
-	
->>>>>>> 8334dc2c546c1a503ec9618c0c2b41f7bad9f1e9
 };
