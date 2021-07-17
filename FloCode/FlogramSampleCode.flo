@@ -1,11 +1,15 @@
 #This is a comment
 #file name (minus .flo) is the name of the object
 
-## <- more than one
-This is a multiline comment
-## <- close multiline comment with more than one two, rest of line is a comment
+<#
+	<# <- more than one
+	This is a multiline comment
+	#> <- close multiline comment with more than one two, rest of line is a comment
+#>
 
-| var_in is false error # show thrown exceptions
+#Testing
+
+| "var_in is false error" # show thrown exceptions
 | other exception
 	x: bool
 	samp_dec: dec
@@ -17,6 +21,9 @@ This is a multiline comment
 	
 	var_in: bool, var_in2: ref int -> function_name -> var_out: int, var_out2: dec {
 		
+	var_in: bool, var_in2: ref int 
+	function_name 
+	var_out: int, var_out2: dec
 		if(var_in == false)
 		{
 			
