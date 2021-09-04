@@ -126,6 +126,7 @@ char* CompileObj::convert_code_human_to_binary(char* human_code, int file_size) 
 	int cur_line = 1;  //track line number for error messages
 	int line_started_at_char_num = 0; //set equal to cur_char whenever we get to a new line
 	int add_extra_one = 0;
+	int cur_pos_binary = 0;		// position in binary code
 
 	char line_ending_char = determine_line_ending_character(human_code, file_size, add_extra_one);
 
@@ -138,6 +139,7 @@ char* CompileObj::convert_code_human_to_binary(char* human_code, int file_size) 
 			cur_char += 32;
 		}
 
+		keywords token_recognized;
 		switch (cur_char) {
 			//comment_single_line		// #
 			case '#':
@@ -151,28 +153,86 @@ char* CompileObj::convert_code_human_to_binary(char* human_code, int file_size) 
 				if (human_code[cur_pos + 1] == '#') {
 					//comment_close	// #>
 					cur_pos = fast_forward_till_comment_end(human_code, cur_pos + 2, file_size, cur_line, line_started_at_char_num, line_ending_char, add_extra_one);
+				} 
+				else {
+					token_recognized = match_symbol(human_code, binary_code, &cur_pos, file_size);
 				}
+
 				break;
 
-			case '\n':
+			/* keywords, data types, identifiers, literals */
+			case 'a' - 'z':	
+				token_recognized = check_letters(human_code, binary_code, &cur_pos, file_size);
+				break;
+
+			/* numbers */
+			case '1' - '9':
+				token_recognized = match_number(human_code, binary_code, &cur_pos, cur_line, file_size, line_started_at_char_num);
+				break;
+			
+
+			/* symbols - punctuation, potential operators */
+			case '{':
+			case '}':
+			case '(':
+			case ')':
+			case '[':
+			case ']':
+			case '!':
+			case '?':
+			case ';':
+			case ':':
+			case ',':
+			case '.':
+			case '$':
+			case '&':
+			case '|':
+			case '>':
+			case '=':
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '%':
+				token_recognized = match_symbol(human_code, binary_code, &cur_pos, cur_line);
+				break;
+
+			/* string literals*/
+			case '"':
+				token_recognized = match_string_literal(human_code, binary_code, &cur_pos, cur_line);
+				break;
+
+
+			case '\n':	// line ending
 			case '\r':
 				cur_pos += add_extra_one;  //add extra one to position.. if we need it with line ending "\n\r"
 				cur_line += 1;
 				line_started_at_char_num = cur_pos + 1;
+				token_recognized = keywords::none;
+				break;
+
 			case ' ':
 			case '\t':
 				// in the future, might want to fast forward through whitespace for a small extra performance boost
 				// afterall whitespace tends to occur in bulk.. might not be worth it
+				token_recognized = keywords::none;
 				break;
 			default:
 				// unrecognized character, report error
+				token_recognized = keywords::none;
 				std::cout << "Error, unrecognized character: " << cur_char << " at line #" << cur_line << " character #" << line_started_at_char_num - cur_pos << "\n";
 				_exit(-1);
 		}
+
+		binary_code[cur_pos_binary] = (char) token_recognized;		 
+		cur_pos_binary++;
 	}
 
 	return binary_code;
 }
+
+
+
 
 // TODO: This is an example of a library function
 void CompileObj::compile_file(const char* file_name)
@@ -182,4 +242,148 @@ void CompileObj::compile_file(const char* file_name)
 	
 	char* binary_code = convert_code_human_to_binary(mem_file, file_size);
 	
+}
+
+
+std::string CompileObj::consume_digits(char *human_code, char *binary_code, int *cur_pos, int file_size) {
+/***
+
+	This method just consumes all the consecutive digits it finds and returns them in a string form
+
+***/
+
+	std::string digits;
+	char cur_char;
+	while (*cur_pos < file_size && human_code[*cur_pos] >= '0' && human_code[*cur_pos] <= '9') {
+		cur_char = human_code[*cur_pos];
+		digits += cur_char;
+		(*cur_pos)++;
+	}
+
+	return digits;
+}
+
+
+
+CompileObj::keywords CompileObj::match_number(char* human_code, char* binary_code, int *cur_pos, int cur_line, int file_size, int column) {
+/***
+	
+	A digit has been detected. Read through all the next digits, if any.
+	Keep number as a string and print feedback message before returning.
+	Return enum item for integer literal or float literal, or error if float format is wrong.
+
+***/
+
+	/* match integer */
+	std::string number = consume_digits(human_code, binary_code, cur_pos, file_size);
+	char cur_char = human_code[*cur_pos];
+
+	/* check for floating point number */
+	if (cur_char == '.') {
+		number += cur_char;
+		(*cur_pos)++;
+		number += consume_digits(human_code, binary_code, cur_pos, file_size);
+
+		/* check for error in float format */
+		if (number.back() == '.') {
+			cur_char = human_code[*cur_pos];
+			std::cout << "Error, unrecognized character: " << cur_char << " at line #" << cur_line << " character #" << column - *cur_pos << "\n";
+			return keywords::none;
+		}
+
+		std::cout << "Matched token type: integer literal, token value: " << number << " at line #" << cur_line << std::endl;
+		return keywords::float_literal;
+	}
+	else {
+		std::cout << "Matched token type: integer literal, token value: " << number << " at line #" << cur_line << std::endl;
+		return keywords::int_literal;
+
+	}
+	
+	return keywords::int_literal;
+}
+
+
+CompileObj::keywords CompileObj::match_type_literal(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+
+	Token has been determined to be a data type literal. Try to match to exact type (e.g int -> int16).
+
+	Keep token and print feedback message before returning. 
+	Return value defaults to error, change according to what was matched.
+
+***/
+
+	return keywords::none;
+}
+
+
+CompileObj::keywords CompileObj::match_keyword(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+
+	Token has been determined to be a keyword. Try to match exact keyword (e.g for -> for or for -> foreach)
+
+	Keep token and print feedback message before returning.
+	Return value defaults to error, change according to what was matched.
+
+***/
+
+	return keywords::none;
+}
+
+
+CompileObj::keywords CompileObj::match_identifier(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+
+	Token has to be an identifier. Try to match to exact type (e.g int -> int16).
+
+	Keep token and print feedback message before returning.
+	Return value defaults to error, change according to what was matched.
+
+***/
+
+	return keywords::none;
+}
+
+
+CompileObj::keywords CompileObj::check_letters(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+	
+	A letter has been detected. Read through all the next characters and identify which token category:
+	- data type
+	- keyword
+	- identifier (if none of the above)
+
+	Call according function (match_type_literal, match_keyword, match_identifier).
+	Return value defaults to error, change according to what was matched.
+
+
+***/
+
+	return keywords::none;
+}
+
+
+CompileObj::keywords CompileObj::match_string_literal(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+
+	String quotes detected. Check if it is a string.
+
+	Keep string until closing quote found or throw error for eof.
+	Return value defaults to error, change according to what was matched.
+
+***/
+
+	return keywords::none;
+}
+
+CompileObj::keywords CompileObj::match_symbol(char* human_code, char* binary_code, int *cur_pos, int file_size) {
+/***
+
+	Punctuation symbol detected. Check for legal combinations (e.g '&&', '<=' etc)
+	Return value defaults to error, change according to what was matched.
+
+***/
+
+	return keywords::none;
 }
