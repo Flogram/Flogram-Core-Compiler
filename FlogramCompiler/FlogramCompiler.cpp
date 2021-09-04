@@ -2,10 +2,12 @@
 //
 
 #include <iostream>
-#include "CompilerLib.h"
+#include "..\CompilerLib\Headers\CompilerLib.h"
 
 int main()
 {
     CompileObj compiler;
-    compiler.compile_file("C:\\Users\\matthew.czarnek\\Documents\\Matt\\Flogram-Core-Compiler\\FloCode\\FlogramSampleCode.flo");
+
+    /* Rememeber to adjust path according to local directory structure */
+    compiler.compile_file("D:\\Flogram\\FloRepository\\Flogram-Core-Compiler\\FloCode\\Sample_MainLoops.flo");
 }
