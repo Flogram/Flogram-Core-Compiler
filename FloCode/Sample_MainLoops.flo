@@ -1,0 +1,49 @@
+<#	file: Sample_MainLoops.flo	
+
+	"Hello World" in Flogram. Plus some code for parsing loops.Previous sample code can still be found in FlogramSampleCode.flo.
+
+	Some important points:
+	- all loops should parse, regardless of line endings/tabs before curly braces
+	- semantic error: i declared as immutable, but is mutated in loops
+	- semantic error: myArray undeclared
+	Note: semantic errors above should go unnoticed by lexer and parser, and only get caught in semantic analysis
+
+#>
+
+
+
+
+
+#This is a comment
+#file name (minus .flo) is the name of the object
+
+<#
+	<# <- more than one
+	This is a multiline comment
+	#> <- close multiline comment with more than one two, rest of line is a comment
+#>
+
+#Testing
+
+Object Main(){
+	fn main() {
+		print("Hello World\n");
+
+		let i:int8 = 0;
+
+		while(i < 5){					# semantic error: i declared as immutable
+			print("Into while loop\n");
+		}
+
+		for(i from 1 to 5)
+		{ 
+			print("Into for loop\n");
+		}
+
+		foreach(i:int8 in myArray)	# semantic error: myArray undeclared
+
+		{		
+			print("In foreach loop\n");
+		}
+	}
+}
